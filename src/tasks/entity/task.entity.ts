@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import * as mongoose from 'mongoose';
+
 
 import { User } from '../../users/entity/user.entity';
-import { Team } from '../../users/entity/team.entity';
+import { Team } from '../../Teams/entity/team.entity';
 
 export type TaskDocument = HydratedDocument<Task>;
 
@@ -19,9 +19,9 @@ export class Task {
   due_date: Date;
   @Prop({ default: false })
   overdue: boolean;
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop()
   userExecutor: User;
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Team' })
+  @Prop()
   teamExecutor: Team;
 }
 enum status {

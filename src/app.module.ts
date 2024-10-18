@@ -8,7 +8,9 @@ import { TasksModule } from './tasks/tasks.module';
     TasksModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<{ uri: string }> => ({
         uri: configService.get<string>('MONGO_DB_URI'),
       }),
       inject: [ConfigService],
