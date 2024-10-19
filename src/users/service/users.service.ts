@@ -22,17 +22,17 @@ export class UsersService {
     }
     throw new Error('User already exists');
   }
-  async updateUser(updateUserDto: UpdateUserDto, id: number): Promise<null> {
+  async updateUser(updateUserDto: UpdateUserDto, id: number): Promise<User> {
     const user = await this._userRepository.findByIdAndUpdate(id, {
       $set: {
-        firstName: updateUserDto?.firstName,
-        lastName: updateUserDto?.lastName,
+        firstName: updateUserDto.firstName,
+        lastName: updateUserDto.lastName,
       },
     });
     if (!user) {
       throw new Error('User not found, try again later');
     }
-    return null;
+    return user;
   }
   async deleteUser(id: number): Promise<null> {
     const user = await this._userRepository.findByIdAndDelete(id);
