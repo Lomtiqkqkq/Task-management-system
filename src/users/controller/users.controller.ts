@@ -1,15 +1,7 @@
-import {
-  Body,
-  Controller,
-  HttpStatus,
-  Param,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, HttpStatus, Param, Post, Res } from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create.user.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { UpdateUserDto } from '../dto/update.user.dto';
 
 @Controller('users')
@@ -23,7 +15,7 @@ export class UsersController {
         .status(HttpStatus.CREATED)
         .send('user created successfully.' + create);
     } catch (err) {
-      res.status(err).send(err.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
     }
   }
   @Post('/update/:id')
@@ -36,16 +28,16 @@ export class UsersController {
       const upd = this._usersService.updateUser(updateUserDto, id);
       res.status(HttpStatus.OK).send('user updated successfully.' + upd);
     } catch (err) {
-      res.status(err).send(err.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
     }
   }
   @Post('/delete/:id')
   deleteUser(@Param('id') id: number, @Res() res: Response) {
     try {
-      const deleted = this._usersService.deleteUser(id);
+      this._usersService.deleteUser(id);
       res.status(HttpStatus.OK).send('user deleted successfully.');
     } catch (err) {
-      res.status(err).send(err.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
     }
   }
 }
