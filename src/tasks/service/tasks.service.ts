@@ -124,4 +124,7 @@ export class TasksService {
       return updatedTask;
     }
   }
+  async getUserTask(userId: string): Promise<object[]> {
+    return await this._taskRepository.find({ userId: userId }).exec();
+  }
 }

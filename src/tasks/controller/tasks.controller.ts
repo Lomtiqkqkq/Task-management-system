@@ -65,4 +65,8 @@ export class TaskController {
   ) {
     return await this.taskService.updatedTaskStatus(taskId, status);
   }
+  @Get('getMyTask/:id')
+  getUserTask(@Param('id') userId: string) {
+    return this.taskService.getUserTask(userId);
+  }
 }

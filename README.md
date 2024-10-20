@@ -26,48 +26,25 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
 
-```bash
-$ npm install
-```
 
-## Running the app
+## Notes By roles
 
-```bash
-# development
-$ npm run start
+### Настройка ролей пользователя ограничена middleware функцией
 
-# watch mode
-$ npm run start:dev
+подразумевается, что админ выступает в качестве ведущего руководителя, который имеет доступ ко всему функционалу, а user может лишь выполнить эту задачу и изменить статус на completed для дальнейшей проверки админом
 
-# production mode
-$ npm run start:prod
-```
+## Базы данных
 
-## Test
+базы данных спроектированы без использования внешних ключей и связей как таковых, так как в подобном тестовом приложении можно обойтись без него:
 
-```bash
-# unit tests
-$ npm run test
+- добавление исполнителей происходит только в сущность задачи (без добавления к юзеру или команде)
+- не прописана строгая валидация входных данных 
+- отсутствует экранизация сущности
 
-# e2e tests
-$ npm run test:e2e
+## Недочёты проекта
 
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+- Отсутствует тестирование
+- Отсутствует авторизация, так как подразумевается, что роли выдаются в ручную админом
+- Органиченный функционал ролей
+- функция получения задач пользователя вынесена в отдельный эндпоинт для пользователя (не корректная функция, так как отсутствует авторизация, подразумевается, что пользователь на основе авторизации может просматривать свои задачи). Сделано это чтобы ограничить возможность у пользователя просматривать чужие задачи через фунцию фильтра
