@@ -8,6 +8,7 @@ import { UpdateTaskDto } from '../dto/update.task.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TaskOverdueEvents } from '../events/task.overdue.event';
 import { TaskHistoryService } from './task.history.service';
+import { TaskGateway } from '../../websocket/task.gateway';
 
 @Injectable()
 export class TasksService {
@@ -15,6 +16,7 @@ export class TasksService {
     @InjectModel('Task') private readonly _taskRepository: Model<Task>,
     private readonly eventEmitter: EventEmitter2,
     private readonly taskHistoryService: TaskHistoryService,
+    private readonly taskGateway: TaskGateway,
   ) {}
   async createTask(createTaskDTO: CreateTaskDto) {
     const task = await this._taskRepository.create(createTaskDTO);
@@ -109,6 +111,17 @@ export class TasksService {
         'task.overdue',
         new TaskOverdueEvents(task.id, task.executorId),
       );
+    }
+  }
+  async updatedTaskStatus(taskId: string, status: eStatus): Promise<object> {
+    const updatedTask = await this._taskRepository.findByIdAndUpdate(
+      taskId,
+      { status: status },
+      { new: true },
+    );
+    if (updatedTask) {
+      this.taskGateway.notifyStatusChange(taskId, status);
+      return updatedTask;
     }
   }
 }
