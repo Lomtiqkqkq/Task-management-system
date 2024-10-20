@@ -12,7 +12,7 @@ import {
 import { TasksService } from '../service/tasks.service';
 import { CreateTaskDto } from '../dto/create.task.dto';
 import { UpdateTaskDto } from '../dto/update.task.dto';
-import { Task } from '../entity/task.entity';
+import { eStatus, Task } from '../entity/task.entity';
 import { RolesMiddleware } from '../../middleware/roles.middleware';
 
 @Controller('tasks')
@@ -57,5 +57,12 @@ export class TaskController {
   @Post('/delete/:id')
   deleteTask(@Param('id') id: string) {
     return this.taskService.deleteTask(id);
+  }
+  @Patch('status/:id')
+  async updateTaskStatus(
+    @Param('id') taskId: string,
+    @Body('status') status: eStatus,
+  ) {
+    return await this.taskService.updatedTaskStatus(taskId, status);
   }
 }
