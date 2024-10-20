@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { User } from '../../users/entity/user.entity';
-import { Team } from '../../Teams/entity/team.entity';
 
 export type TaskDocument = HydratedDocument<Task>;
 
@@ -11,18 +9,16 @@ export class Task {
   header: string;
   @Prop()
   description: string;
-  @Prop()
-  status: status;
+  @Prop({ default: 'waiting' })
+  status: eStatus;
   @Prop()
   due_date: Date;
   @Prop({ default: false })
   overdue: boolean;
-  @Prop()
-  userExecutor: User;
-  @Prop()
-  teamExecutor: Team;
+  @Prop({ allowNull: true, default: null })
+  executorId: string;
 }
-enum status {
+export enum eStatus {
   waiting = 'waiting',
   executing = 'executing',
   error = 'error',

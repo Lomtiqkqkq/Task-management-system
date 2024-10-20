@@ -1,13 +1,16 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
 import { ValidationPipe } from '@nestjs/common';
-dotenv.config();
+import { AllExceptionsFilter } from './exceptions/error';
+
+const configService = new ConfigService();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  const port = process.env.PORT || 3000;
+  app.useGlobalFilters(new AllExceptionsFilter());
+  const port = configService.get<string>('PORT') || 3000;
   await app.listen(port, () => {
     console.log(`Server running on port: ${port}`);
   });

@@ -2,10 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TasksModule } from './tasks/tasks.module';
+import { UsersModule } from './users/users.module';
+import { TeamsModule } from './Teams/teams.module';
 
 @Module({
   imports: [
-    TasksModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (
@@ -15,6 +19,9 @@ import { TasksModule } from './tasks/tasks.module';
       }),
       inject: [ConfigService],
     }),
+    TasksModule,
+    UsersModule,
+    TeamsModule,
   ],
   controllers: [],
   providers: [],
