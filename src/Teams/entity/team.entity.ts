@@ -6,11 +6,9 @@ export type TeamDocument = HydratedDocument<Team>;
 
 @Schema()
 export class Team {
-  @Prop()
+  @Prop({ required: true, unique: true })
   teamName: string;
-  @Prop()
-  members: number[];
-  @Prop()
-  tasks: Task[];
+  @Prop({ default: null })
+  membersId: string[];
 }
 export const TeamSchema = SchemaFactory.createForClass(Team);
