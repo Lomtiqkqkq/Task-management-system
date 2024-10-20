@@ -1,9 +1,11 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { TeamsService } from '../service/teams.service';
 
 import { TeamMemberDTO } from '../dto/team.member.dto';
 import { CreateTeamDto } from '../dto/create.team.dto';
+import { RolesMiddleware } from '../../middleware/roles.middleware';
 
+@UseGuards(RolesMiddleware)
 @Controller('teams')
 export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}

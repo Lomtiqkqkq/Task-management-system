@@ -12,5 +12,7 @@ export class User {
   lastName: string;
   @Prop({ default: null })
   team: Team | null;
+  @Prop({ default: 'user', enum: ['admin', 'user'] })
+  role: 'admin' | 'user';
 }
 export const UserSchema = SchemaFactory.createForClass(User);

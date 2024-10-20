@@ -7,19 +7,23 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from '../service/tasks.service';
 import { CreateTaskDto } from '../dto/create.task.dto';
 import { UpdateTaskDto } from '../dto/update.task.dto';
 import { Task } from '../entity/task.entity';
+import { RolesMiddleware } from '../../middleware/roles.middleware';
 
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TasksService) {}
+  @UseGuards(RolesMiddleware)
   @Post('/create')
   createTask(@Body() createTaskDto: CreateTaskDto) {
     return this.taskService.createTask(createTaskDto);
   }
+  @UseGuards(RolesMiddleware)
   @Patch('/assign/:id')
   assignTask(
     @Param('id') id: string,
@@ -28,13 +32,18 @@ export class TaskController {
   ) {
     return this.taskService.assignTask(id, teamId['teamId'], userId['userId']);
   }
+  @UseGuards(RolesMiddleware)
   @Patch('/remove/:id')
   removeTaskExec(@Param('id') id: string) {
     return this.taskService.removeTaskFromExec(id);
   }
   @Patch('/update/:id')
   patchTask(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.patchTask(updateTaskDto, id);
+    return this.taskService.patchTask(
+      updateTaskDto,
+      id,
+      updateTaskDto.updatedBy,
+    );
   }
   @Get('/findQuery')
   findQuery(
@@ -44,5 +53,9 @@ export class TaskController {
   ): Promise<Task[]> {
     const dueDateParsed = dueDate ? new Date(dueDate) : undefined;
     return this.taskService.filteredTasks(status, dueDateParsed, executorId);
+  }
+  @Post('/delete/:id')
+  deleteTask(@Param('id') id: string) {
+    return this.taskService.deleteTask(id);
   }
 }

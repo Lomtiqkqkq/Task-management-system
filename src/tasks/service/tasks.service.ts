@@ -5,11 +5,16 @@ import { eStatus, Task } from '../entity/task.entity';
 import { CreateTaskDto } from '../dto/create.task.dto';
 import { ServiceError } from '../../exceptions/service.error';
 import { UpdateTaskDto } from '../dto/update.task.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TaskOverdueEvents } from '../events/task.overdue.event';
+import { TaskHistoryService } from './task.history.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel('Task') private readonly _taskRepository: Model<Task>,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly taskHistoryService: TaskHistoryService,
   ) {}
   async createTask(createTaskDTO: CreateTaskDto) {
     const task = await this._taskRepository.create(createTaskDTO);
@@ -49,11 +54,24 @@ export class TasksService {
       'something went wrong, don`t found user or team executor',
     );
   }
-  async patchTask(updateTaskDto: UpdateTaskDto, id: string): Promise<object> {
-    const task = this._taskRepository
-      .findByIdAndUpdate(id, updateTaskDto)
-      .exec();
-    return { message: 'task updated', task: task };
+  async patchTask(
+    updateTaskDto: UpdateTaskDto,
+    id: string,
+    updatedBy: string,
+  ): Promise<object> {
+    const task = await this._taskRepository.findById(id);
+    if (!task) {
+      throw new ServiceError('Task not found');
+    }
+    const changes = JSON.stringify({ ...task.toObject(), ...updateTaskDto });
+    Object.assign(task, UpdateTaskDto);
+    await task.save();
+    await this.taskHistoryService.addHistoryEntry(id, changes, updatedBy);
+    return task;
+  }
+  async deleteTask(id: string) {
+    const task = await this._taskRepository.findByIdAndDelete(id);
+    return { message: 'task deleted successfully', task: task };
   }
   async filteredTasks(
     status?: string,
@@ -74,5 +92,23 @@ export class TasksService {
       filter.executor = { $exists: false };
     }
     return this._taskRepository.find(filter).exec();
+  }
+  async eventOverdueTask() {
+    const nowTime = new Date();
+    const overdueTasks = await this._taskRepository
+      .find({
+        dueDate: { $lt: nowTime },
+      })
+      .exec();
+    overdueTasks.map((task) => {
+      task.overdue = true;
+    });
+
+    for (const task of overdueTasks) {
+      this.eventEmitter.emit(
+        'task.overdue',
+        new TaskOverdueEvents(task.id, task.executorId),
+      );
+    }
   }
 }

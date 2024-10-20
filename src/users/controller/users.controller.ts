@@ -1,8 +1,10 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create.user.dto';
 import { UpdateUserDto } from '../dto/update.user.dto';
+import { RolesMiddleware } from '../../middleware/roles.middleware';
 
+@UseGuards(RolesMiddleware)
 @Controller('users')
 export class UsersController {
   constructor(private readonly _usersService: UsersService) {}
